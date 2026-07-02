@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "kd-research"
+version = "0.1.0"
+description = "Research engineering scaffold for a future knowledge distillation reproduction."
+readme = "README.md"
+requires-python = ">=3.11,<3.14"
+dependencies = [
+  "numpy",
+  "pandas",
+  "matplotlib",
+  "PyYAML",
+  "tqdm",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+pytorch = ["torch", "torchvision"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"

@@ -1,0 +1,39 @@
+# Structure example only. This is not a final experiment configuration.
+project:
+  name: knowledge-distillation-research
+  config_status: example_only
+
+experiment:
+  id: null
+  seed: null
+
+dataset:
+  name: null
+  root: data
+  split:
+    train: null
+    validation: null
+    test: null
+
+models:
+  teacher:
+    architecture: null
+  student:
+    architecture: null
+
+training:
+  optimizer: null
+  learning_rate: null
+  batch_size: null
+  epochs: null
+
+distillation:
+  temperature: null
+  alpha: null
+
+evaluation:
+  metrics:
+    - accuracy
+    - parameter_count
+    - model_size_mb
+    - latency_ms

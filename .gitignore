@@ -1,0 +1,52 @@
+# Project environment
+.venv/
+.tmp/
+
+# Python caches and build outputs
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+build/
+dist/
+
+# Editors and notebooks
+.idea/
+.ipynb_checkpoints/
+
+# Secrets and local environment files
+.env
+.env.*
+!.env.example
+
+# Local datasets: keep only documentation
+/data/*
+!/data/README.md
+
+# Checkpoints and model artifacts
+/checkpoints/*
+!/checkpoints/.gitkeep
+*.pt
+*.pth
+*.ckpt
+*.onnx
+
+# Runtime logs
+/logs/*
+!/logs/.gitkeep
+*.log
+
+# Generated results
+/results/raw/*
+!/results/raw/.gitkeep
+/results/figures/*
+!/results/figures/.gitkeep
+
+# Operating-system temporary files
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.tmp
+~*

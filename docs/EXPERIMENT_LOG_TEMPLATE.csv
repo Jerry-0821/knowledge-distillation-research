@@ -1,0 +1,1 @@
+experiment_id,date,git_commit,config_name,seed,status,dataset,teacher_model,student_model,temperature,alpha,learning_rate,batch_size,epochs,accuracy,parameter_count,model_size_mb,latency_ms,notes
