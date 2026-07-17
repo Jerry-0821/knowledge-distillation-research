@@ -1,6 +1,7 @@
 # Project environment
 .venv/
 .tmp/
+.tmp_pytest/
 
 # Python caches and build outputs
 __pycache__/
@@ -15,6 +16,10 @@ dist/
 # Editors and notebooks
 .idea/
 .ipynb_checkpoints/
+
+# Local student scratch work
+/00_STUDENT_WORK/
+/homework/
 
 # Secrets and local environment files
 .env

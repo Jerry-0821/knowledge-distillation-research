@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "kd-research"
 version = "0.1.0"
-description = "Research engineering scaffold for a future knowledge distillation reproduction."
+description = "Small knowledge distillation reproduction with MNIST teacher-student experiments."
 readme = "README.md"
 requires-python = ">=3.11,<3.14"
 dependencies = [

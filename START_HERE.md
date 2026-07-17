@@ -1,35 +1,60 @@
 # Start Here
 
-这是 Knowledge Distillation 论文复现的本地科研仓库。现在已经准备好目录结构、项目专用 `.venv`、VS Code 配置、环境检查、基础测试和研究记录模板。
+This file is a quick orientation guide for returning to the project.
 
-当前**没有**下载 dataset，没有实现 teacher/student model、Knowledge Distillation loss 或 training loop，也没有任何实验结果。
+## Current Project Stage
 
-## 第一次打开项目
+MNIST Version 1 is complete.
+
+The project now contains a working teacher-student knowledge distillation pipeline:
+
+1. Train a larger CNN teacher on MNIST with hard labels.
+2. Train a smaller CNN student with hard labels only.
+3. Train the same student with knowledge distillation.
+4. Compare the hard-label student and the distilled student under controlled settings.
+5. Record results and write a cautious summary.
+
+## Main Files to Read
+
+Start with these files:
+
+- `README.md`: public GitHub overview.
+- `docs/MNIST_V1_PROJECT_SUMMARY_FINAL.md`: final MNIST V1 write-up.
+- `docs/MNIST_V1_RESULTS_SUMMARY.md`: short result interpretation.
+- `results/tables/mnist_v1_result_summary.csv`: result table.
+- `docs/CONTROLLED_EXPERIMENT_LOG.md`: detailed experiment record.
+
+## Main Code Files
+
+- `src/kd_research/data/mnist.py`: MNIST dataset and dataloader helpers.
+- `src/kd_research/models/simple_cnn_teacher_model.py`: teacher CNN.
+- `src/kd_research/models/simple_cnn_student_model.py`: student CNN.
+- `scripts/train_mnist_teacher.py`: hard-label teacher training.
+- `scripts/train_mnist_baseline.py`: hard-label student baseline.
+- `scripts/train_mnist_distillation.py`: KD student training.
+
+## Reproduce the Main Runs
+
+Use the local virtual environment:
 
 ```powershell
-code .
+.\.venv\Scripts\python.exe scripts\train_mnist_teacher.py --epochs 1 --batch-size 64 --learning-rate 0.001 --seed 0 --checkpoint-path checkpoints\mnist_teacher_baseline_001.pt --download
 ```
-
-在 VS Code integrated terminal 中启用项目环境：
 
 ```powershell
-.\.venv\Scripts\Activate.ps1
+.\.venv\Scripts\python.exe scripts\train_mnist_baseline.py --epochs 1 --batch-size 64 --learning-rate 0.001 --seed 0
 ```
-
-如果 PowerShell 阻止 activation script，可以不激活，直接使用 `.\.venv\Scripts\python.exe` 执行后续命令。
-
-## 检查与测试
 
 ```powershell
-python scripts/check_environment.py
-python scripts/smoke_test.py
-python -m pytest
+.\.venv\Scripts\python.exe scripts\train_mnist_distillation.py --teacher-checkpoint checkpoints\mnist_teacher_baseline_001.pt --epochs 1 --batch-size 64 --learning-rate 0.001 --temperature 4.0 --alpha 0.7 --seed 0
 ```
 
-或一次运行：
+## Current Conclusion
 
-```powershell
-.\scripts\verify_setup.ps1
-```
+Knowledge distillation did not automatically improve every setting. In this MNIST V1 setup, temperature mattered, and some KD settings produced a small improvement over the same student trained only with hard labels. The result should be described carefully because MNIST is simple and the improvement is small.
 
-正式开始读论文后，先打开 `docs/PAPER_NOTES_TEMPLATE.md`，阅读论文的 title、abstract、introduction 和实验问题，再由你自己填写模板；不要从结论倒推答案。
+## Next Direction
+
+Version 2 should test Fashion-MNIST as a short bridge because it is harder than MNIST but keeps the same image shape and 10-class structure.
+
+Version 3 can test CIFAR-10 as a stronger portfolio stretch.

@@ -1,0 +1,10 @@
+run_group,run_type,seed,temperature,alpha,test_accuracy,comparison_baseline,accuracy_difference,notes
+teacher_checkpoint,reference,not_recorded,,,0.9788,,,Fixed teacher used for KD.
+hard_label_seed0,baseline,0,,,0.9547,,,Same-seed hard-label baseline for seed 0.
+kd_temp2_alpha07_seed0,corrected_kd,0,2,0.7,0.9537,hard_label_seed0,-0.001,Temperature 2.0 did not beat hard-label seed 0.
+kd_temp2_alpha09_seed0,corrected_kd,0,2,0.9,0.9535,hard_label_seed0,-0.0012,Alpha 0.9 did not improve over alpha 0.7.
+kd_temp4_alpha07_seed0,corrected_kd,0,4,0.7,0.9599,hard_label_seed0,0.0052,First corrected seed-0 KD result above hard-label.
+hard_label_seed1,baseline,1,,,0.9517,,,Same-seed hard-label baseline for seed 1.
+kd_temp4_alpha07_seed1,corrected_kd,1,4,0.7,0.9526,hard_label_seed1,0.0009,Small KD improvement for seed 1.
+kd_temp6_alpha065_seed0,exploratory_kd,0,6,0.65,0.9609,hard_label_seed0,0.0062,Best observed seed-0 KD result so far; exploratory.
+kd_temp6_alpha06_seed0,exploratory_kd,0,6,0.6,0.9607,hard_label_seed0,0.006,Exploratory seed-0 KD result.
