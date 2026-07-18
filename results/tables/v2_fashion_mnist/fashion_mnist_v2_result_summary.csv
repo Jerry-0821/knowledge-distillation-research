@@ -1,0 +1,8 @@
+run_group,run_type,dataset,model_role,seed,temperature,alpha,epochs,batch_size,learning_rate,test_accuracy,comparison_baseline,accuracy_difference,notes
+teacher_seed0,reference,Fashion-MNIST,teacher,0,,,1,64,0.001,0.8760,,,"Fixed teacher checkpoint for first V2 seed-0 KD comparison."
+student_baseline_seed0,baseline,Fashion-MNIST,student_baseline,0,,,1,64,0.001,0.8597,,,"Hard-label student baseline for first V2 seed-0 comparison. KD should be compared against this same student setup."
+kd_temp2_alpha07_seed0,controlled_kd,Fashion-MNIST,kd_student,0,2.0,0.7,1,64,0.001,0.8604,student_baseline_seed0,0.0007,"First approved V2 seed-0 KD run; slightly above hard-label student baseline, but only one seed."
+kd_temp6_alpha07_seed0,exploratory_kd,Fashion-MNIST,kd_student,0,6.0,0.7,1,64,0.001,0.8642,student_baseline_seed0,0.0045,"Unplanned exploratory temperature check; above seed-0 hard-label student baseline, but not yet repeated."
+kd_temp7_alpha07_seed0,exploratory_kd,Fashion-MNIST,kd_student,0,7.0,0.7,1,64,0.001,0.8646,student_baseline_seed0,0.0049,"Best visible exploratory V2 seed-0 result from manual temperature/alpha checks; not yet repeated."
+student_baseline_seed1,baseline,Fashion-MNIST,student_baseline,1,,,1,64,0.001,0.8579,,,"Hard-label student baseline for V2 seed-1 reliability check."
+kd_temp7_alpha07_seed1,reliability_check,Fashion-MNIST,kd_student,1,7.0,0.7,1,64,0.001,0.8570,student_baseline_seed1,-0.0009,"Seed-1 reliability check for the best visible seed-0 exploratory setting; KD was slightly below baseline."

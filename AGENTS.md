@@ -37,6 +37,65 @@ Negative, failed, or disappointing results must still be recorded.
 
 ## Student vs Codex Responsibility
 
+Before each learning, experiment, code, or writing step, Codex should pause and
+separate responsibilities:
+
+```text
+Student should do:
+- understand the research reason for the step
+- make or confirm the research judgment
+- interpret important results in their own words
+
+Codex can help:
+- scaffold files and scripts
+- run verification after explaining what is being checked
+- record outputs exactly
+- polish writing without changing the student's claim
+```
+
+This split is part of the teaching method. Do not treat the project as only a
+coding task.
+
+## Responsibility Rule
+
+The student is using this project to learn the paper reproduction process. Codex
+must not silently make all research decisions.
+
+Student should do:
+
+- Decide the research question. For example, the student should confirm whether
+  the V2 question is: "Does KD help more on Fashion-MNIST than MNIST?"
+- Explain concepts in their own words, such as temperature, alpha, hard loss,
+  soft loss, and why Fashion-MNIST is harder.
+- Approve experiment design before full training. Before running full training,
+  ask the student to confirm the comparison, seed, temperature, alpha, epochs,
+  and success criteria.
+- Interpret results first. After a run finishes, show the numbers and ask what
+  the student thinks they mean before writing the final conclusion.
+- Write the first draft of portfolio-facing text. For README, final summary,
+  limitations, and main findings, the student drafts first. Codex can polish
+  grammar and clarity but should not add new claims unless it clearly labels
+  them.
+
+Codex can do:
+
+- Inspect repo files and explain the current structure.
+- Create scaffolding files after explaining what they are for.
+- Edit code after the student approves the plan.
+- Run tests and smoke tests.
+- Record experiment outputs exactly into logs or CSV files.
+- Fix mechanical bugs.
+- Polish grammar without changing the student's meaning.
+- Prepare GitHub packaging after the student approves the final story.
+
+Important boundary:
+
+- Do not run full training or hyperparameter search without student
+  confirmation.
+- Do not write final research claims before the student gives an interpretation.
+- Do not claim KD is better just because one run is better.
+- Do not hide weak or failed results.
+
 Student should do or explicitly confirm:
 
 - Research questions and claims.
@@ -76,10 +135,15 @@ Current Version 1 status:
 MNIST V1 complete.
 ```
 
+Current Version 2 status:
+
+```text
+Fashion-MNIST V2 complete.
+```
+
 Recommended future route:
 
 ```text
-V2: Fashion-MNIST short bridge.
 V3: CIFAR-10 stronger portfolio stretch.
 ```
 
@@ -87,22 +151,32 @@ V3: CIFAR-10 stronger portfolio stretch.
 
 For this project, Codex replies should start with a short pipeline/progress header so the student does not lose the main thread.
 
-Use this shape:
+During active Fashion-MNIST V2 work, use this V2-only shape with emoji status markers:
 
 ```markdown
-## Pipeline / Progress
+## V2 Pipeline / Progress
 
-1. MNIST V1 — [status]
-2. GitHub packaging — [status]
-3. V2 Fashion-MNIST — [status]
-4. V3 CIFAR-10 — [status]
+1. V2 scope — ✅ done
+2. Fashion-MNIST data loader — ✅ done
+3. Data loader tests — ✅ done
+4. Data smoke test — ✅ done
+5. Training scripts — 🟡 current
+6. One-batch smoke tests — ⬜ not yet
+7. Teacher training — ⬜ not yet
+8. Hard-label baseline — ⬜ not yet
+9. KD controlled run — ⬜ not yet
+10. V2 results summary — ⬜ not yet
+11. README update — ⬜ not yet
 
 Current position: ...
 Now doing: ...
 Not doing yet: ...
 ```
 
-Keep the header concise.
+Use ✅ for done, 🟡 for current/next, and ⬜ for not yet. Keep the header concise.
+
+After V2 packaging is complete, do not restart V2 unless the student explicitly
+asks. Future work should normally move toward V3 CIFAR-10 planning.
 
 ## Public Repo Guidance
 
@@ -113,6 +187,9 @@ For GitHub, prefer polished project-facing files:
 - `docs/MNIST_V1_PROJECT_SUMMARY_FINAL.md`
 - `docs/MNIST_V1_RESULTS_SUMMARY.md`
 - `results/tables/mnist_v1_result_summary.csv`
+- `docs/v2_fashion_mnist/FASHION_MNIST_V2_SCOPE.md`
+- `docs/v2_fashion_mnist/FASHION_MNIST_V2_RESULTS_SUMMARY.md`
+- `results/tables/v2_fashion_mnist/fashion_mnist_v2_result_summary.csv`
 
 Keep local scratch work private unless the student explicitly wants it published:
 

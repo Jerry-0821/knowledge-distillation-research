@@ -400,3 +400,362 @@ exploratory KD temperature 6.0 seed 0
 ```
 
 Purpose: Summarize what has actually been observed so far.
+
+## Part 5: Fashion-MNIST V2 Blueprint
+
+### V2 Step 0: Scope approval
+
+Create and approve the Fashion-MNIST V2 scope before implementation.
+
+Purpose: Keep Version 2 focused on the research question:
+
+```text
+Does knowledge distillation show a clearer improvement over hard-label training when the dataset is more difficult than MNIST?
+```
+
+### V2 Step 1: Fashion-MNIST data loader and smoke test
+
+Add a Fashion-MNIST data loader without changing the MNIST V1 loader.
+
+Purpose: Check that Fashion-MNIST can be loaded as grayscale `1 x 28 x 28` images with 10 classes before any model training begins.
+
+Important: This is only a data pipeline smoke test. It does not train a model, evaluate accuracy, or say anything about KD performance.
+
+### V2 Step 2: Training script one-batch smoke tests
+
+Add Fashion-MNIST V2 training scripts for:
+
+```text
+teacher hard-label training
+student hard-label baseline
+student KD training
+```
+
+Purpose: Check that the three training code paths run without crashing before full training begins.
+
+Important: These smoke tests use one train batch and one eval batch only. The numbers are not meaningful performance results and should not be used to claim that any model or method is better.
+
+Student review boundary: Before full training, the student should review the scripts and confirm the experiment design, including comparison, seed, temperature, alpha, epochs, teacher checkpoint, and success criteria.
+
+### V2 Step 3: First approved seed-0 controlled run
+
+Run the first real Fashion-MNIST V2 pass with:
+
+```text
+seed = 0
+epochs = 1
+batch size = 64
+learning rate = 0.001
+temperature = 2.0
+alpha = 0.7
+```
+
+Purpose: Train a real teacher checkpoint first, then compare the same student architecture trained with hard labels against the same student architecture trained with KD.
+
+Success criterion: KD should be compared against the hard-label student baseline with the same seed. A better KD result is only preliminary until repeated with another seed; a weaker KD result must still be recorded.
+
+## Part 6: Fashion-MNIST V2 Data Log
+
+### Quick Result Table
+
+| Run | Type | Key setting | Output numbers | Meaning | Raw file |
+|---|---|---|---|---|---|
+| Fashion-MNIST data smoke test 001 | Data smoke test | batch size 8, download enabled | train size 60000; test size 10000; image batch shape `(8, 1, 28, 28)`; label batch shape `(8,)`; image range `[0.000, 1.000]` | Fashion-MNIST downloaded locally and the loader produced the expected grayscale image tensor shape. No training was run. | not saved as CSV |
+| Fashion-MNIST data smoke test 002 | Data smoke test | batch size 8, existing local data | train size 60000; test size 10000; image batch shape `(8, 1, 28, 28)`; label batch shape `(8,)`; image range `[0.000, 1.000]` | Student reran the Fashion-MNIST data check after the notebook/test walkthrough. The loader produced the expected grayscale image tensor shape. No training was run. | not saved as CSV |
+| Fashion-MNIST teacher smoke test 001 | One-batch smoke test | teacher, seed 0, 1 train batch, 1 eval batch | train loss 2.2878; test accuracy 0.2500 | Teacher script ran and saved a smoke-test checkpoint. Accuracy is not meaningful because this was one batch only. | not saved as CSV |
+| Fashion-MNIST teacher smoke test 002 | One-batch smoke test | student rerun of teacher smoke, seed 0, 1 train batch, 1 eval batch | train loss 2.2878; test accuracy 0.2500 | Student reran the teacher smoke test from terminal. The script ran and saved the smoke-test checkpoint again. Accuracy is not meaningful because this was one batch only. | not saved as CSV |
+| Fashion-MNIST baseline smoke test 001 | One-batch smoke test | student hard-label baseline, seed 0, 1 train batch, 1 eval batch | train loss 2.3172; test accuracy 0.1562 | Student baseline script ran. Accuracy is not meaningful because this was one batch only. | not saved as CSV |
+| Fashion-MNIST baseline smoke test 002 | One-batch smoke test | student rerun of hard-label baseline, seed 0, 1 train batch, 1 eval batch | train loss 2.3172; test accuracy 0.1562 | Student reran the baseline smoke test from terminal. Accuracy is not meaningful because this was one train batch and one eval batch only. | not saved as CSV |
+| Fashion-MNIST KD smoke test 001 | One-batch smoke test | KD student, smoke teacher checkpoint, seed 0, temperature 2.0, alpha 0.7, 1 train batch, 1 eval batch | hard loss 2.3172; soft loss 0.4226; combined loss 1.7489; test accuracy 0.1562 | KD script loaded the fixed smoke teacher and trained only the student. Accuracy is not meaningful because this was one batch only. | not saved as CSV |
+| Fashion-MNIST KD smoke test 002 | One-batch smoke test | student rerun of KD smoke, smoke teacher checkpoint, seed 0, temperature 2.0, alpha 0.7, 1 train batch, 1 eval batch | hard loss 2.3172; soft loss 0.4226; combined loss 1.7489; test accuracy 0.1562 | Student reran the KD smoke test from terminal. The script loaded the fixed smoke teacher and trained only the student. Accuracy is not meaningful because this was one batch only. | not saved as CSV |
+| Fashion-MNIST teacher seed 0 | Real teacher run | teacher, seed 0, 1 full epoch, batch size 64, learning rate 0.001 | train loss 0.4167; test accuracy 0.8760 | First real V2 teacher checkpoint for seed-0 comparison. This is a reference teacher run, not a KD result. | `results/raw/fashion_mnist_v2_teacher_seed0.csv` |
+| Fashion-MNIST student baseline seed 0 | Real hard-label student baseline | student, seed 0, 1 full epoch, batch size 64, learning rate 0.001 | train loss 0.4762; test accuracy 0.8597 | First real V2 hard-label student baseline. KD seed 0 should be compared against this same student setup. | `results/raw/fashion_mnist_v2_seed0_controlled_pair.csv` |
+| Fashion-MNIST KD temp 2.0 alpha 0.7 seed 0 | Real KD run | student, fixed teacher seed 0, temperature 2.0, alpha 0.7, 1 full epoch | hard loss 0.4580; soft loss 0.3830; combined loss 0.4355; test accuracy 0.8604 | First approved V2 KD run. Compare against hard-label student baseline 0.8597, not teacher 0.8760. | `results/raw/fashion_mnist_v2_seed0_controlled_pair.csv` |
+| Fashion-MNIST KD temp 6.0 alpha 0.7 seed 0 | Exploratory KD run | student, fixed teacher seed 0, temperature 6.0, alpha 0.7, 1 full epoch | hard loss 0.4530; soft loss 0.7430; combined loss 0.5400; test accuracy 0.8642 | Unplanned exploratory temperature check. Compare against hard-label student baseline 0.8597, not teacher 0.8760. Needs repeat before stronger claim. | `results/raw/fashion_mnist_v2_seed0_controlled_pair.csv` |
+| Fashion-MNIST KD temp 7.0 alpha 0.7 seed 0 | Exploratory KD run | student, fixed teacher seed 0, temperature 7.0, alpha 0.7, 1 full epoch | hard loss 0.4529; soft loss 0.7524; combined loss 0.5428; test accuracy 0.8646 | Best visible exploratory V2 seed-0 KD result so far. Compare against hard-label student baseline 0.8597, not teacher 0.8760. Needs repeat before stronger claim. | `results/raw/fashion_mnist_v2_seed0_controlled_pair.csv` |
+| Fashion-MNIST student baseline seed 1 | Real hard-label student baseline | student, seed 1, 1 full epoch, batch size 64, learning rate 0.001 | train loss 0.4969; test accuracy 0.8579 | Seed-1 hard-label student baseline for reliability check. | `results/raw/fashion_mnist_v2_seed1_temp7_alpha07_pair.csv` |
+| Fashion-MNIST KD temp 7.0 alpha 0.7 seed 1 | Reliability check | student, fixed teacher seed 0, seed 1, temperature 7.0, alpha 0.7, 1 full epoch | hard loss 0.4785; soft loss 0.8910; combined loss 0.6022; test accuracy 0.8570 | Seed-1 check for the best visible seed-0 exploratory setting. KD was slightly below the matching hard-label student baseline 0.8579. | `results/raw/fashion_mnist_v2_seed1_temp7_alpha07_pair.csv` |
+
+### Details: Fashion-MNIST Data Smoke Test 001
+
+Command:
+
+```text
+.venv\Scripts\python.exe scripts\v2_fashion_mnist\check_fashion_mnist_data.py --download
+```
+
+Result:
+
+```text
+train dataset size = 60000
+test dataset size = 10000
+image batch shape = (8, 1, 28, 28)
+label batch shape = (8,)
+image dtype = torch.float32
+label dtype = torch.int64
+image value range = [0.000, 1.000]
+sample labels = [4, 2, 4, 0, 2, 5, 2, 7]
+```
+
+Meaning: The Fashion-MNIST data pipeline works for the first V2 data check. The image shape matches the MNIST model input shape, so the V1 simple CNN teacher and student can be reused for the first Fashion-MNIST pass. These numbers are not model performance results.
+
+### Details: Fashion-MNIST Data Smoke Test 002
+
+Command:
+
+```text
+.venv\Scripts\python.exe scripts\v2_fashion_mnist\check_fashion_mnist_data.py
+```
+
+Result:
+
+```text
+train dataset size = 60000
+test dataset size = 10000
+image batch shape = (8, 1, 28, 28)
+label batch shape = (8,)
+image dtype = torch.float32
+label dtype = torch.int64
+image value range = [0.000, 1.000]
+sample labels = [7, 6, 6, 5, 1, 2, 9, 0]
+```
+
+Meaning: The student reran the Fashion-MNIST data smoke test using the existing local dataset. The data loader still produced the expected dataset sizes, tensor shape, dtype, and value range. No training was run, so these numbers are not model performance results.
+
+### Details: Fashion-MNIST Teacher Smoke Test 001
+
+Command:
+
+```text
+.venv\Scripts\python.exe scripts\v2_fashion_mnist\train_fashion_mnist_teacher.py --epochs 1 --batch-size 64 --learning-rate 0.001 --seed 0 --max-train-batches 1 --max-eval-batches 1 --checkpoint-path checkpoints\v2_fashion_mnist_teacher_smoke.pt
+```
+
+Result:
+
+```text
+train loss = 2.2878
+test accuracy = 0.2500
+checkpoint = checkpoints\v2_fashion_mnist_teacher_smoke.pt
+```
+
+Meaning: The teacher training script can run one train batch, evaluate one batch, and save a checkpoint. This checkpoint is only for KD smoke testing and should not be used as the real V2 teacher.
+
+### Details: Fashion-MNIST Teacher Smoke Test 002
+
+Command:
+
+```text
+.venv\Scripts\python.exe scripts\v2_fashion_mnist\train_fashion_mnist_teacher.py --epochs 1 --batch-size 64 --seed 0 --max-train-batches 1 --max-eval-batches 1 --checkpoint-path checkpoints\v2_fashion_mnist_teacher_smoke.pt
+```
+
+Result:
+
+```text
+train loss = 2.2878
+test accuracy = 0.2500
+checkpoint = checkpoints\v2_fashion_mnist_teacher_smoke.pt
+```
+
+Meaning: The student reran the teacher one-batch smoke test from terminal. The script executed, evaluated, and saved the smoke checkpoint again. This remains a smoke test only, not a real teacher performance result.
+
+### Details: Fashion-MNIST Baseline Smoke Test 001
+
+Command:
+
+```text
+.venv\Scripts\python.exe scripts\v2_fashion_mnist\train_fashion_mnist_baseline.py --epochs 1 --batch-size 64 --learning-rate 0.001 --seed 0 --max-train-batches 1 --max-eval-batches 1
+```
+
+Result:
+
+```text
+train loss = 2.3172
+test accuracy = 0.1562
+```
+
+Meaning: The hard-label student baseline script can run one train batch and evaluate one batch. This is not a real baseline result.
+
+### Details: Fashion-MNIST Baseline Smoke Test 002
+
+Command:
+
+```text
+.venv\Scripts\python.exe scripts\v2_fashion_mnist\train_fashion_mnist_baseline.py --epochs 1 --batch-size 64 --seed 0 --max-train-batches 1 --max-eval-batches 1
+```
+
+Result:
+
+```text
+train loss = 2.3172
+test accuracy = 0.1562
+```
+
+Meaning: The student reran the hard-label student baseline smoke test from terminal. The low accuracy is expected because this was limited to one train batch and one eval batch. It is a code-path check, not a real baseline result.
+
+### Details: Fashion-MNIST KD Smoke Test 001
+
+Command:
+
+```text
+.venv\Scripts\python.exe scripts\v2_fashion_mnist\train_fashion_mnist_distillation.py --teacher-checkpoint checkpoints\v2_fashion_mnist_teacher_smoke.pt --epochs 1 --batch-size 64 --learning-rate 0.001 --temperature 2.0 --alpha 0.7 --seed 0 --max-train-batches 1 --max-eval-batches 1
+```
+
+Result:
+
+```text
+hard loss = 2.3172
+soft loss = 0.4226
+combined loss = 1.7489
+test accuracy = 0.1562
+```
+
+Meaning: The KD script can load the fixed smoke teacher checkpoint, compute hard loss, soft loss, and combined loss, and update only the student. This is not a real KD result.
+
+### Details: Fashion-MNIST KD Smoke Test 002
+
+Command:
+
+```text
+.venv\Scripts\python.exe scripts\v2_fashion_mnist\train_fashion_mnist_distillation.py --teacher-checkpoint checkpoints\v2_fashion_mnist_teacher_smoke.pt --epochs 1 --batch-size 64 --seed 0 --temperature 2.0 --alpha 0.7 --max-train-batches 1 --max-eval-batches 1
+```
+
+Result:
+
+```text
+hard loss = 2.3172
+soft loss = 0.4226
+combined loss = 1.7489
+test accuracy = 0.1562
+```
+
+Meaning: The student reran the KD smoke test from terminal. The script loaded the fixed smoke teacher checkpoint, computed hard loss, soft loss, and combined loss, and updated only the student. This is a code-path check, not a real KD result.
+
+### Details: Fashion-MNIST Teacher Seed 0
+
+Command:
+
+```text
+.venv\Scripts\python.exe scripts\v2_fashion_mnist\train_fashion_mnist_teacher.py --epochs 1 --batch-size 64 --learning-rate 0.001 --seed 0 --checkpoint-path checkpoints\v2_fashion_mnist_teacher_seed0.pt
+```
+
+Result:
+
+```text
+train loss = 0.4167
+test accuracy = 0.8760
+checkpoint = checkpoints\v2_fashion_mnist_teacher_seed0.pt
+```
+
+Meaning: This is the first real Fashion-MNIST V2 teacher checkpoint for the seed-0 controlled comparison. It was trained with hard labels only. No KD claim can be made from this run because the hard-label student baseline and KD student have not been run yet.
+
+### Details: Fashion-MNIST Student Baseline Seed 0
+
+Command:
+
+```text
+.venv\Scripts\python.exe scripts\v2_fashion_mnist\train_fashion_mnist_baseline.py --epochs 1 --batch-size 64 --learning-rate 0.001 --seed 0
+```
+
+Result:
+
+```text
+train loss = 0.4762
+test accuracy = 0.8597
+```
+
+Meaning: This is the first real Fashion-MNIST V2 hard-label student baseline. The run used the student model with true labels only. After this run, the V2 script was renamed more clearly to `train_fashion_mnist_student_baseline.py`; the old filename remains as a compatibility wrapper for reproducibility.
+
+### Details: Fashion-MNIST KD Temperature 2.0 Alpha 0.7 Seed 0
+
+Command:
+
+```text
+.venv\Scripts\python.exe scripts\v2_fashion_mnist\train_fashion_mnist_distillation.py --teacher-checkpoint checkpoints\v2_fashion_mnist_teacher_seed0.pt --epochs 1 --batch-size 64 --learning-rate 0.001 --temperature 2.0 --alpha 0.7 --seed 0
+```
+
+Result:
+
+```text
+hard loss = 0.4580
+soft loss = 0.3830
+combined loss = 0.4355
+test accuracy = 0.8604
+```
+
+Meaning: This is the first approved V2 seed-0 KD run. It should be compared against the hard-label student baseline accuracy `0.8597`, not the teacher accuracy `0.8760`.
+
+### Details: Fashion-MNIST KD Temperature 6.0 Alpha 0.7 Seed 0
+
+Command:
+
+```text
+.venv\Scripts\python.exe scripts\v2_fashion_mnist\train_fashion_mnist_distillation.py --teacher-checkpoint checkpoints\v2_fashion_mnist_teacher_seed0.pt --epochs 1 --batch-size 64 --learning-rate 0.001 --temperature 6.0 --alpha 0.7 --seed 0
+```
+
+Result:
+
+```text
+hard loss = 0.4530
+soft loss = 0.7430
+combined loss = 0.5400
+test accuracy = 0.8642
+```
+
+Meaning: This is an unplanned exploratory temperature check after the approved temperature 2.0 run. It should still be recorded. The result should be treated cautiously because it was not part of the first approved controlled design and has not been repeated on another seed.
+
+### Details: Fashion-MNIST KD Temperature 7.0 Alpha 0.7 Seed 0
+
+Command:
+
+```text
+.venv\Scripts\python.exe scripts\v2_fashion_mnist\train_fashion_mnist_distillation.py --teacher-checkpoint checkpoints\v2_fashion_mnist_teacher_seed0.pt --epochs 1 --batch-size 64 --learning-rate 0.001 --temperature 7 --alpha 0.7 --seed 0
+```
+
+Result:
+
+```text
+hard loss = 0.4529
+soft loss = 0.7524
+combined loss = 0.5428
+test accuracy = 0.8646
+```
+
+Meaning: This is the best visible exploratory Fashion-MNIST V2 seed-0 KD result so far. It is above the hard-label student baseline `0.8597` by `0.0049`, but it came from exploratory alpha/temperature checking and has not been repeated on another seed.
+
+Note: The student reported trying multiple temperature and alpha settings, including temperatures `2, 4, 6, 8, 10` and alpha values `0.65, 0.7, 0.75`. The exact outputs for those other exploratory runs were not provided in this chat, so only the visible best run above is recorded with exact numeric details here. If the other terminal outputs are available, they should also be recorded rather than only keeping the best result.
+
+### Details: Fashion-MNIST Student Baseline Seed 1
+
+Command:
+
+```text
+.venv\Scripts\python.exe scripts\v2_fashion_mnist\train_fashion_mnist_student_baseline.py --epochs 1 --batch-size 64 --learning-rate 0.001 --seed 1
+```
+
+Result:
+
+```text
+train loss = 0.4969
+test accuracy = 0.8579
+```
+
+Meaning: This is the matching hard-label student baseline for the seed-1 reliability check.
+
+### Details: Fashion-MNIST KD Temperature 7.0 Alpha 0.7 Seed 1
+
+Command:
+
+```text
+.venv\Scripts\python.exe scripts\v2_fashion_mnist\train_fashion_mnist_distillation.py --teacher-checkpoint checkpoints\v2_fashion_mnist_teacher_seed0.pt --epochs 1 --batch-size 64 --learning-rate 0.001 --temperature 7.0 --alpha 0.7 --seed 1
+```
+
+Result:
+
+```text
+hard loss = 0.4785
+soft loss = 0.8910
+combined loss = 0.6022
+test accuracy = 0.8570
+```
+
+Meaning: This seed-1 reliability check did not repeat the seed-0 improvement. KD was slightly below the matching hard-label student baseline by `0.0009`.
