@@ -6,14 +6,16 @@ The goal is not to reproduce every experiment from the paper. Instead, the proje
 
 ## Current Status
 
-MNIST Version 1 and Fashion-MNIST Version 2 are complete.
+MNIST Version 1, Fashion-MNIST Version 2, and CIFAR-10 Version 3 are complete.
 
 The project includes:
 
 - MNIST dataset loading and training utilities.
 - Fashion-MNIST dataset loading and V2 training scripts.
+- CIFAR-10 dataset loading, validation split support, and V3 training scripts.
 - A larger CNN teacher model.
 - A smaller CNN student model.
+- CIFAR-10 CNN teacher and student models.
 - A hard-label student baseline.
 - A knowledge distillation student training script.
 - Controlled comparisons using fixed seeds.
@@ -57,6 +59,31 @@ More details:
 - [Fashion-MNIST V2 result summary CSV](results/tables/v2_fashion_mnist/fashion_mnist_v2_result_summary.csv)
 - [Controlled experiment log](docs/CONTROLLED_EXPERIMENT_LOG.md)
 
+## CIFAR-10 V3 Key Result Summary
+
+CIFAR-10 V3 tested the same teacher-student KD idea on a harder RGB image
+dataset. Unlike V2, this required a new CIFAR-10 data loader, a train/validation/test
+split, and CIFAR-10-specific CNN models.
+
+The selected KD setting was `T=6.0`, `alpha=0.5`, batch size `64`, and learning
+rate `0.001`.
+
+| Stage | Seed(s) | Hard-label Student | KD Student | Difference | Notes |
+|---|---:|---:|---:|---:|---|
+| 10-epoch validation mean | 0, 1, 2 | 0.6853 | 0.6994 | +0.0141 | KD helped early training |
+| 20-epoch validation mean | 0, 1, 2 | 0.7387 | 0.7165 | -0.0222 | KD advantage did not persist |
+| 70-epoch validation | 0 | 0.7912 | 0.7744 | -0.0168 | hard-label baseline stronger |
+| 20-epoch final test | 0 | 0.7385 | 0.7144 | -0.0241 | official test set, no further tuning |
+| 70-epoch final test | 0 | 0.7860 | 0.7622 | -0.0238 | official test set, no further tuning |
+
+More details:
+
+- [CIFAR-10 V3 scope](docs/v3_cifar10/CIFAR10_V3_SCOPE.md)
+- [CIFAR-10 V3 results summary](docs/v3_cifar10/CIFAR10_V3_RESULTS_SUMMARY.md)
+- [CIFAR-10 V3 result summary CSV](results/tables/v3_cifar10/cifar10_v3_result_summary.csv)
+- [Controlled experiment log](docs/CONTROLLED_EXPERIMENT_LOG.md)
+- V3 figures are stored under `results/figures/v3_cifar10/`.
+
 ## Main Findings
 
 Knowledge distillation did not automatically improve every setting. On MNIST, the hard-label student already performed strongly, so the improvement from distillation was small. Temperature mattered: higher temperature settings produced better KD results in the tested runs.
@@ -65,12 +92,20 @@ The Version 1 conclusion is cautious: KD can help the student model under suitab
 
 The Fashion-MNIST V2 conclusion is also cautious. Seed 0 showed a small KD improvement over the hard-label student, especially with higher temperature, but seed 1 did not repeat the improvement. This suggests that temperature affects KD performance, but the tested V2 runs do not show enough evidence to claim that KD consistently beats hard-label training on Fashion-MNIST.
 
+CIFAR-10 V3 showed a clearer early-training KD improvement at 10 epochs across
+seeds 0, 1, and 2. However, the advantage did not persist when training was
+extended to 20 and 70 epochs. The final official test evaluation on seed 0 also
+favored the hard-label student. V3 therefore suggests that KD may help early
+training under this setup, but it does not support a strong claim that KD
+improves final CIFAR-10 performance overall.
+
 ## Repository Structure
 
 - `src/kd_research/`: reusable Python package code for data loading and model definitions.
-- `scripts/`: environment checks, MNIST training scripts, and V2 Fashion-MNIST scripts.
+- `scripts/`: environment checks, MNIST scripts, V2 Fashion-MNIST scripts, and V3 CIFAR-10 scripts.
 - `docs/`: paper notes, reproduction scope, experiment logs, and final summaries.
 - `results/tables/`: small tracked result tables.
+- `results/figures/`: tracked figures for experiment visualization.
 - `results/raw/`: local raw experiment records, ignored by Git except `.gitkeep`.
 - `data/`: local datasets, ignored by Git except documentation.
 - `checkpoints/`: local model checkpoints, ignored by Git except `.gitkeep`.
@@ -86,7 +121,8 @@ Set-Location knowledge-distillation-research
 .\.venv\Scripts\Activate.ps1
 ```
 
-The project was run on CPU for Version 1 and Version 2.
+The project was run on CPU for Version 1 and Version 2. Version 3 was run with
+CUDA locally when available because CIFAR-10 training is larger.
 
 ## Reproduce MNIST V1
 
@@ -146,6 +182,35 @@ Run the KD student:
 .\.venv\Scripts\python.exe scripts\v2_fashion_mnist\train_fashion_mnist_distillation.py --teacher-checkpoint checkpoints\v2_fashion_mnist_teacher_seed0.pt --epochs 1 --batch-size 64 --learning-rate 0.001 --temperature 7.0 --alpha 0.7 --seed 0
 ```
 
+## Reproduce CIFAR-10 V3
+
+Check CIFAR-10 data:
+
+```powershell
+.\.venv\Scripts\python.exe scripts\v3_cifar10\check_cifar10_data.py --download
+```
+
+Train the V3 CIFAR-10 teacher checkpoint:
+
+```powershell
+.\.venv\Scripts\python.exe scripts\v3_cifar10\train_cifar10_teacher.py --epochs 10 --batch-size 64 --learning-rate 0.001 --seed 0 --device auto --checkpoint-path checkpoints\v3_cifar10_teacher_lr0001_10epoch_metrics.pt
+```
+
+Run the hard-label student baseline:
+
+```powershell
+.\.venv\Scripts\python.exe scripts\v3_cifar10\train_cifar10_student_baseline.py --epochs 10 --batch-size 64 --learning-rate 0.001 --seed 0 --device auto
+```
+
+Run the selected KD student setting:
+
+```powershell
+.\.venv\Scripts\python.exe scripts\v3_cifar10\train_cifar10_distillation.py --teacher-checkpoint checkpoints\v3_cifar10_teacher_lr0001_10epoch_metrics.pt --epochs 10 --batch-size 64 --learning-rate 0.001 --temperature 6.0 --alpha 0.5 --seed 0 --device auto
+```
+
+The longer 20-epoch and 70-epoch final evaluations are recorded in
+`docs/v3_cifar10/CIFAR10_V3_RESULTS_SUMMARY.md`.
+
 ## Validation
 
 Run the test suite:
@@ -166,9 +231,14 @@ This repository does not include:
 - Large-scale training.
 - A full hyperparameter grid search.
 - Committed datasets or model checkpoints.
+- A claim that KD always beats hard-label training.
 
 Datasets and checkpoints are generated locally and are intentionally ignored by Git.
 
 ## Future Work
 
-Version 3 can extend the same pipeline to CIFAR-10 as a stronger portfolio stretch. CIFAR-10 is more realistic, but it will require more model and training adjustments than Fashion-MNIST.
+- Add CIFAR-10 normalization and data augmentation.
+- Train a stronger teacher model.
+- Try longer teacher training and learning-rate scheduling.
+- Repeat final CIFAR-10 test evaluation across more seeds.
+- Explore a wider but still controlled KD hyperparameter search.

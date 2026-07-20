@@ -141,10 +141,18 @@ Current Version 2 status:
 Fashion-MNIST V2 complete.
 ```
 
+Current Version 3 status:
+
+```text
+CIFAR-10 V3 complete. README/GitHub packaging should preserve the cautious
+conclusion: KD helped at 10 epochs but did not beat the hard-label baseline at
+20/70 epochs or on the final seed-0 official test evaluation.
+```
+
 Recommended future route:
 
 ```text
-V3: CIFAR-10 stronger portfolio stretch.
+Package the completed V1/V2/V3 project and keep future extensions separate.
 ```
 
 ## Response Header
@@ -190,6 +198,10 @@ For GitHub, prefer polished project-facing files:
 - `docs/v2_fashion_mnist/FASHION_MNIST_V2_SCOPE.md`
 - `docs/v2_fashion_mnist/FASHION_MNIST_V2_RESULTS_SUMMARY.md`
 - `results/tables/v2_fashion_mnist/fashion_mnist_v2_result_summary.csv`
+- `docs/v3_cifar10/CIFAR10_V3_SCOPE.md`
+- `docs/v3_cifar10/CIFAR10_V3_RESULTS_SUMMARY.md`
+- `results/tables/v3_cifar10/cifar10_v3_result_summary.csv`
+- `results/figures/v3_cifar10/`
 
 Keep local scratch work private unless the student explicitly wants it published:
 

@@ -48,6 +48,9 @@ dist/
 !/results/raw/.gitkeep
 /results/figures/*
 !/results/figures/.gitkeep
+!/results/figures/v3_cifar10/
+!/results/figures/v3_cifar10/*.png
+/results/figures/v3_cifar10/mplconfig/
 
 # Operating-system temporary files
 .DS_Store
