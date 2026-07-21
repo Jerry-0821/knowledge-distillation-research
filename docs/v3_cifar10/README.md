@@ -19,6 +19,7 @@ Main files:
 - `CIFAR10_V3_SCOPE.md`
 - `CIFAR10_V3_ENHANCEMENTS.md`
 - `CIFAR10_V3_RESULTS_SUMMARY.md`
+- `V3_RESEARCH_REFLECTION.md`
 
 Related V3 locations:
 

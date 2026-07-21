@@ -97,6 +97,7 @@ More details:
 
 - [CIFAR-10 V3 scope](docs/v3_cifar10/CIFAR10_V3_SCOPE.md)
 - [CIFAR-10 V3 results summary](docs/v3_cifar10/CIFAR10_V3_RESULTS_SUMMARY.md)
+- [CIFAR-10 V3 research reflection](docs/v3_cifar10/V3_RESEARCH_REFLECTION.md)
 - [CIFAR-10 V3 result summary CSV](results/tables/v3_cifar10/cifar10_v3_result_summary.csv)
 - [Controlled experiment log](docs/CONTROLLED_EXPERIMENT_LOG.md)
 - V3 figures are stored under `results/figures/v3_cifar10/`.
