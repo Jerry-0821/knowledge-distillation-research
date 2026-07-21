@@ -35,11 +35,7 @@ Important: Accuracy from this step is not meaningful.
 
 ### Step 2: First full KD run
 
-Remove the smoke-test limits:
-
-```text
---max-train-batches 1 --max-eval-batches 1
-```
+Remove both `--max-train-batches` and `--max-eval-batches` from the command.
 
 Purpose: Train the distilled student for one full epoch and evaluate on the full test set.
 
@@ -1415,9 +1411,10 @@ Reason:
 
 ```text
 Although LR 0.0005 ended with slightly higher validation accuracy at epoch 10
-in the 10-epoch comparison, the student judged LR 0.001 to have stronger
-training behavior and less concerning late-run instability. The two learning
-rates were very close on validation metrics:
+in the 10-epoch comparison, the validation margin was small enough that the two
+learning rates were treated as approximately tied for this V3 check. LR 0.001
+was retained as the default/consistent setting for the teacher and student
+experiments, not because it was clearly superior on validation accuracy:
 
 LR 0.001 epoch 10: validation loss = 0.5502, validation accuracy = 0.8104
 LR 0.0005 epoch 10: validation loss = 0.5543, validation accuracy = 0.8138
@@ -1765,6 +1762,17 @@ should be treated as final evaluation outputs, not as hyperparameter-tuning
 feedback. No further tuning should be based on the test set.
 ```
 
+Reproducibility note:
+
+```text
+These final-test commands retrained the 20-epoch and 70-epoch models from
+scratch with --evaluate-test. They were not simple test-set evaluations of the
+earlier validation-only checkpoints. Because the current CUDA training setup is
+not strictly deterministic, the final-test runs can have slightly different
+validation accuracies from the earlier validation-only runs even when the seed
+and hyperparameters match.
+```
+
 Commands:
 
 ```text
@@ -1811,7 +1819,8 @@ Result:
 Interpretation:
 
 ```text
-The official test set confirms the longer-training validation story for seed 0.
+The official test set is consistent with the longer-training validation story
+for seed 0.
 For both 20 and 70 epochs, the hard-label student outperformed the selected KD
 student on test accuracy:
 

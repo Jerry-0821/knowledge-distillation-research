@@ -2,7 +2,9 @@
 
 This folder keeps CIFAR-10 Version 3 documentation separate from MNIST Version 1 and Fashion-MNIST Version 2.
 
-Current V3 status: CIFAR-10 implementation, tests, training scripts, controlled runs, final test evaluation, and results summary are complete. README/GitHub packaging is still pending.
+Current V3 status: CIFAR-10 implementation, tests, training scripts,
+controlled runs, final test evaluation, results summary, README updates, and
+GitHub packaging are complete.
 
 Use this folder for:
 

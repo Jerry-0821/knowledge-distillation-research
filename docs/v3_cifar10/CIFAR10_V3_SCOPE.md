@@ -2,11 +2,16 @@
 
 This file defines the planned scope for Version 3 of the knowledge distillation reproduction project.
 
-Current stage:
+Historical planning document: this scope was written before implementation.
+V3 implementation, evaluation, results summary, and GitHub packaging are now
+complete. The original planning language below is preserved so the project
+history remains clear.
+
+Original stage at the time of writing:
 
 ```text
 V3 scope draft created.
-CIFAR-10 implementation has not started.
+CIFAR-10 implementation had not started.
 ```
 
 Version 3 should begin only after this scope is reviewed and approved.

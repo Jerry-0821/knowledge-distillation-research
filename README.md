@@ -68,6 +68,11 @@ split, and CIFAR-10-specific CNN models.
 The selected KD setting was `T=6.0`, `alpha=0.5`, batch size `64`, and learning
 rate `0.001`.
 
+The CIFAR-10 teacher has `289,194` trainable parameters, while the student has
+`36,122`. This gives about an `8.01x` teacher/student parameter ratio, or an
+`87.51%` reduction from teacher to student. This is architecture context only,
+not proof that KD succeeded.
+
 | Stage | Seed(s) | Hard-label Student | KD Student | Difference | Notes |
 |---|---:|---:|---:|---:|---|
 | 10-epoch validation mean | 0, 1, 2 | 0.6853 | 0.6994 | +0.0141 | KD helped early training |
@@ -75,6 +80,18 @@ rate `0.001`.
 | 70-epoch validation | 0 | 0.7912 | 0.7744 | -0.0168 | hard-label baseline stronger |
 | 20-epoch final test | 0 | 0.7385 | 0.7144 | -0.0241 | official test set, no further tuning |
 | 70-epoch final test | 0 | 0.7860 | 0.7622 | -0.0238 | official test set, no further tuning |
+
+For the 10-epoch and 20-epoch validation means, sample standard deviation over
+seeds 0, 1, and 2 was:
+
+| Stage | Hard-label SD | KD SD | Paired Difference SD |
+|---|---:|---:|---:|
+| 10-epoch validation | 0.0090 | 0.0040 | 0.0053 |
+| 20-epoch validation | 0.0030 | 0.0297 | 0.0267 |
+
+The 20-epoch KD result was less stable across seeds, especially because seed 1
+was much weaker. No statistical significance test is claimed from only three
+seeds.
 
 More details:
 
@@ -121,8 +138,9 @@ Set-Location knowledge-distillation-research
 .\.venv\Scripts\Activate.ps1
 ```
 
-The project was run on CPU for Version 1 and Version 2. Version 3 was run with
-CUDA locally when available because CIFAR-10 training is larger.
+The CPU setup is sufficient to run the project, but CIFAR-10 training will be
+slower on CPU. Version 3 experiments were run locally with a CUDA-enabled
+PyTorch environment because CIFAR-10 training is larger.
 
 ## Reproduce MNIST V1
 

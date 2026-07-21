@@ -28,6 +28,23 @@ The main comparison stayed the same as V1/V2:
 | Selected KD alpha | 0.5 |
 | Teacher checkpoint | `checkpoints/v3_cifar10_teacher_lr0001_10epoch_metrics.pt` |
 
+## Architecture / Compression Context
+
+The CIFAR-10 teacher and student are both small CNNs, but the teacher has more
+capacity than the student. These parameter counts are calculated directly from
+the current model definitions.
+
+| Model | Trainable Parameters |
+|---|---:|
+| CIFAR-10 teacher CNN | 289,194 |
+| CIFAR-10 student CNN | 36,122 |
+
+The teacher has about `8.01x` as many trainable parameters as the student. The
+student has about `87.51%` fewer trainable parameters than the teacher.
+
+This is architecture/compression context only. It does not prove that KD
+succeeded; the actual hard-label versus KD comparison is reported below.
+
 ## Teacher Learning Rate Check
 
 The teacher learning-rate check compared `0.001` and `0.0005` for 10 epochs.
@@ -37,8 +54,11 @@ The teacher learning-rate check compared `0.001` and `0.0005` for 10 epochs.
 | 0.001 | 0 | 10 | 0.8280 | 0.8104 | Selected |
 | 0.0005 | 0 | 10 | 0.8093 | 0.8138 | Slightly higher validation accuracy |
 
-The validation margin was small, and LR `0.001` trained more strongly by epoch
-10. V3 selected LR `0.001` for the teacher and student comparisons.
+The validation difference was only `0.0034` absolute accuracy, or 0.34
+percentage points. The two learning rates were treated as approximately tied
+for this small V3 check. LR `0.001` was retained as the default setting for
+consistency across the teacher and student experiments, not because it was
+clearly superior on validation accuracy.
 
 ## Main 10-Epoch Validation Comparison
 
@@ -58,8 +78,17 @@ Mean validation accuracy:
 | Hard-label student | 0.6853 |
 | KD student | 0.6994 |
 
+Using sample standard deviation across seeds 0, 1, and 2:
+
+| Setting | Mean Validation Accuracy | Sample SD |
+|---|---:|---:|
+| Hard-label student | 0.6853 | 0.0090 |
+| KD student | 0.6994 | 0.0040 |
+| Paired KD - hard-label difference | +0.0141 | 0.0053 |
+
 This was the clearest positive V3 result. It suggests that KD can help early
-training under this setup.
+training under this setup. With only three seeds, this should be treated as a
+small robustness check, not a formal statistical significance test.
 
 ## 20-Epoch Validation Check
 
@@ -79,8 +108,18 @@ Mean validation accuracy:
 | Hard-label student | 0.7387 |
 | KD student | 0.7165 |
 
+Using sample standard deviation across seeds 0, 1, and 2:
+
+| Setting | Mean Validation Accuracy | Sample SD |
+|---|---:|---:|
+| Hard-label student | 0.7387 | 0.0030 |
+| KD student | 0.7165 | 0.0297 |
+| Paired KD - hard-label difference | -0.0222 | 0.0267 |
+
 By 20 epochs, the hard-label baseline mostly caught up or surpassed the KD
-student. Seed 2 was effectively a tie.
+student. Seed 2 was effectively a tie. The 20-epoch KD results were also much
+less stable across seeds than the hard-label baseline, mainly because seed 1
+was much weaker.
 
 ## 70-Epoch Validation Check
 
@@ -100,6 +139,13 @@ The official CIFAR-10 test set was used only after the validation-based
 experiments were complete. These results should not be used for further
 hyperparameter tuning.
 
+Important reproducibility note: these final-test commands retrained the 20-epoch
+and 70-epoch models from scratch with `--evaluate-test`. They were not simple
+test-set evaluations of the earlier validation-only checkpoints. Because the
+current CUDA training setup is not strictly deterministic, the validation
+accuracies in the final-test runs can differ slightly from the earlier
+validation-only runs even when the seed and hyperparameters match.
+
 | Epochs | Setting | Seed | Final Validation Accuracy | Official Test Accuracy | Difference vs Hard-label Test |
 |---:|---|---:|---:|---:|---:|
 | 20 | Hard-label student | 0 | 0.7422 | 0.7385 | reference |
@@ -107,8 +153,9 @@ hyperparameter tuning.
 | 70 | Hard-label student | 0 | 0.7812 | 0.7860 | reference |
 | 70 | KD, T=6.0, alpha=0.5 | 0 | 0.7656 | 0.7622 | -0.0238 |
 
-The final test set confirms the longer-training validation story for seed 0:
-the selected KD student did not beat the hard-label student at 20 or 70 epochs.
+The final test set is consistent with the longer-training validation story for
+seed 0: the selected KD student did not beat the hard-label student at 20 or
+70 epochs.
 
 ## Student Interpretation
 
@@ -160,3 +207,21 @@ a controlled reproduction than only reporting the best-looking number.
 
 Local raw CSV files and run logs are kept under `results/raw/`. The raw folder
 is ignored by Git unless explicitly changed.
+
+## Figure Reproducibility Note
+
+The public repository tracks the V3 PNG figures under
+`results/figures/v3_cifar10/` and the compact summary tables under
+`results/tables/v3_cifar10/`.
+
+However, many V3 figures were generated from local per-epoch CSV files and run
+logs under `results/raw/v3_cifar10/`, which are intentionally ignored by Git.
+No public plotting script is currently tracked. This means the figures document
+the observed results, but not every figure can be regenerated from only the
+public tracked files.
+
+A clean future reproducibility improvement would be to publish minimal
+non-sensitive per-epoch CSVs under a tracked folder such as
+`results/records/v3_cifar10/` and add a plotting script. Datasets, checkpoints,
+and large raw logs should stay untracked unless there is a specific reason to
+publish them.
